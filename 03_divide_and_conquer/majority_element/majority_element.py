@@ -6,60 +6,39 @@ import itertools
 def get_sort_key(x):
     return x[0]
 
-def merge(left, right):
+def combine(left, right):
     r = { }
-    # print (left)
-    for x, count in left:
+    for x, count in (left + right):
         if x in r:
             r[x] += count
         else:
             r[x] = count
-    for x, count in right:
-        if x in r:
-            r[x] += count
-        else:
-            r[x] = count
-    result = list(r.items())
-    # print("returning " + str(result))
-    return result
+    return list(r.items())
 
 def get_majority_element_internal(a, left, right):
     if left > right:
         return []
-
     if left == right:
         return [(a[left], 1)]
     if left + 1 == right:
-        # print(a)
-        # print(left)
-        # print(right)
         if a[left] == a[right]:
             return [(a[left], 2)]
         else:
-            return [(a[left], 1), (a[right], 1)]#.sort(key=get_sort_key)
+            return [(a[left], 1), (a[right], 1)]
 
     mid = (left + right) // 2
     left_results = get_majority_element_internal(a, left, mid)
     right_results = get_majority_element_internal(a, mid + 1, right)
-    return merge(left_results, right_results)
+    return combine(left_results, right_results)
 
 def get_majority_element(a, left, right):
-    merged = get_majority_element_internal(a, left, right)
-    merged.sort(key=lambda x:x[1],reverse=True)
-    # print("we've got: " +str(merged))
-    if len(merged) == 0:
+    counts = get_majority_element_internal(a, left, right)
+    if len(counts) == 0:
         return -1
-    top_item,top_count = merged[0]
-    return 1 if top_count > len(a) // 2 else -1
 
-    # if right - left == 1:
-    #     return 
-    # if left == right:
-    #     return -1
-    # if left + 1 == right:
-    #     return a[left]
-    #write your code here
-    return -1
+    counts.sort(key=lambda x:x[1],reverse=True)
+    _, top_count = counts[0]
+    return 1 if top_count > len(a) // 2 else -1
 
 def generate_test_array(size, has_majority_item):
     if size == 0:
@@ -79,14 +58,14 @@ def generate_test_array(size, has_majority_item):
     perms = list(itertools.permutations(a))
     return list(perms)[random.randint(0, len(perms)-1)]
 
-test = False
+test = True
 if test:
-    test_case_count = 100
+    test_case_count = 500
     success = 0
     failures = []
 
     for i in range(0, test_case_count):
-        size = max(1, i % 9)
+        size = max(2, i % 10)
         has_majority_item = i % 2 == 0
         test_array = generate_test_array(size, has_majority_item)
         a = test_array
