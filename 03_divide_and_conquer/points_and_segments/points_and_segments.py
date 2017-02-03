@@ -45,7 +45,45 @@ def fast_count_segments_internal(segments, points):
     #     counts[i] = cnt
     return counts
 
+def compare(left_point, right_point):
+    (left_value, left_type, left_index) = left_point
+    (right_value, right_type, right_index) = right_point
+    d = left_value - right_value
+    if d != 0:
+        return d
+    
+    order = ['l', 'p', 'r']
+    left_order = order.index(left_type)
+    right_order = order.index(right_type)
+    return left_order - right_order
+
 def fst(tuple): return tuple[0]
+
+def sort_points(all_points, l, r):
+    if l >= r:
+        return
+    
+    pivot = all_points[random.randint(l, r)]
+    lo, hi = l, r
+    i = l
+    while i <= hi:
+        c = compare(all_points[i], pivot)
+        if c < 0:
+            all_points[i], all_points[lo] = all_points[lo], all_points[i]
+            i += 1
+            lo += 1
+            continue
+        if c == 0:
+            i += 1
+            continue
+        if c > 0:
+            all_points[hi], all_points[i] = all_points[i], all_points[hi]
+            hi -= 1
+            continue
+        raise Exception("Unknown error")
+    
+    sort_points(all_points, l, lo - 1)
+    sort_points(all_points, hi + 1, r)
 
 def fast_count_segments(starts, ends, points):
     all_points = [(0,'0',0)] * (len(starts) + len(ends) + len(points))# value, char, index
@@ -60,7 +98,7 @@ def fast_count_segments(starts, ends, points):
     for i in range(0, len(points)):
         all_points[offset + i] = (points[i], 'p', i)
     
-    all_points.sort(key=fst)
+    sort_points(all_points, 0, len(all_points) - 1)
     counts = [0] * len(points)
     counter = 0
 
@@ -114,18 +152,24 @@ def generate_test_case(segments_count, points_count):
 
 if test:
     times = []
-    test_case_count = 1
+    test_case_count = 10
     
     success = 0
     failures = []
 
+    test_cases = [
+        ([2], [4],[4]),
+        ([-4], [2], [-4, -4, 2, 10, -4]),
+        ([8, 9, 12], [11, 11, 14], [11, 11, 12])
+    ]
+
     i = 0
     for i in range(0, test_case_count):        
-        segments_count = 10
-        points_count = 5
-        (starts, ends, points) = ([0,-3,7], [5,2,10],[1,6])
+        segments_count = 20000
+        points_count = 500
+        # (starts, ends, points) = test_cases[i]# ([2], [4],[4])
         # (starts, ends, points) = ([2, 8, 6, 6, 1, 4, 3, 3, 7, 0],[3, 2, 7, 5, 7, 0, 6, 5, 0, 8],[2, 2, 8, 7, 8])#[3, 3, 1, 3, 1]
-        # (starts, ends, points) = generate_test_case(segments_count, points_count)
+        (starts, ends, points) = generate_test_case(segments_count, points_count)
         
         # print("running against " + str(len(points)) + " points")
         expected = naive_count_segments(starts, ends, points)
