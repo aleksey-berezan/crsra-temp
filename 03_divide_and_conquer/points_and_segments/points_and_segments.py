@@ -36,12 +36,12 @@ def sort_points(all_points, l, r):
             hi -= 1
             continue
         raise Exception("Unknown error")
-    
+
     sort_points(all_points, l, lo - 1)
     sort_points(all_points, hi + 1, r)
 
 def fast_count_segments(starts, ends, points):
-    all_points = [(0,'0',0)] * (len(starts) + len(ends) + len(points))# value, char, index
+    all_points = [(0,'0',0)] * (len(starts) + len(ends) + len(points))
 
     offset = 0
     for i in range(0, len(starts)):
@@ -52,7 +52,7 @@ def fast_count_segments(starts, ends, points):
     offset += len(ends)
     for i in range(0, len(points)):
         all_points[offset + i] = (points[i], 'p', i)
-    
+
     sort_points(all_points, 0, len(all_points) - 1)
     counts = [0] * len(points)
     counter = 0
@@ -75,7 +75,6 @@ m = data[1]
 starts = data[2:2 * n + 2:2]
 ends   = data[3:2 * n + 2:2]
 points = data[2 * n + 2:]
-#use fast_count_segments
 cnt = fast_count_segments(starts, ends, points)
 for x in cnt:
     print(x, end=' ')
