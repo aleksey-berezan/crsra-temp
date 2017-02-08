@@ -1,15 +1,10 @@
 #Uses python3
 import sys
 
-
 # memoized: map<input->sequence>
 def optimal_sequence_internal(n, memo):
-    if n in memo:
+    if memo[n] != -1:
         return memo[n]
-    if n == 1:
-        prev,count = (0,0)
-        memo[1] = (prev,count)
-        return prev,count
 
     sub_results = [None] * 3
     sub_results[0] = (n - 1, optimal_sequence_internal(n - 1, memo))
@@ -25,7 +20,8 @@ def optimal_sequence_internal(n, memo):
     return result
 
 def optimal_sequence(n):
-    memo = {}
+    memo = [-1] * (n+1)
+    memo[0] = memo[1] = (0,0)
     for i in range(1, n + 1):
         optimal_sequence_internal(i, memo)
 
