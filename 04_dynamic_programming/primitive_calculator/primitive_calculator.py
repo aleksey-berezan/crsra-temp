@@ -1,23 +1,28 @@
 #Uses python3
 import sys
 
+def min_by_snd(left, right):
+    _, lcount = left
+    _, rcount = right
+    return left if lcount < rcount else right
+
 # memoized: map<input->sequence>
 def optimal_sequence_internal(n, memo):
     if memo[n] != -1:
-        return memo[n]
+        prev, count = memo[n]
+        return count
 
-    sub_results = [None] * 3
-    sub_results[0] = (n - 1, optimal_sequence_internal(n - 1, memo))
-    sub_results[1] = (n // 2, optimal_sequence_internal(n // 2, memo)) if n % 2 == 0 else None
-    sub_results[2] = (n // 3, optimal_sequence_internal(n // 3, memo)) if n % 3 == 0 else None
+    prev, count = n - 1, optimal_sequence_internal(n - 1, memo)
+    if n % 2 == 0:
+        prev2, count2 = n // 2, optimal_sequence_internal(n // 2, memo)
+        prev, count = min_by_snd((prev, count),(prev2, count2))
 
-    sub_results = list([x for x in sub_results if x != None])
-    sub_results.sort(key = lambda x:x[1][1], reverse = False)
+    if n % 3 == 0:
+        prev3, count3 = n // 3, optimal_sequence_internal(n // 3, memo)
+        prev, count = min_by_snd((prev, count),(prev3, count3))
 
-    prev, count = sub_results[0]
-    result = (prev, memo[prev][1] + 1)
-    memo[n] = result
-    return result
+    memo[n] = (prev, count + 1)
+    return count + 1
 
 def optimal_sequence(n):
     memo = [-1] * (n+1)
@@ -34,6 +39,7 @@ def optimal_sequence(n):
         prev, _ = memo[prev]
         i += 1
     return reversed(sequence)
+
 # main
 
 input = input()
