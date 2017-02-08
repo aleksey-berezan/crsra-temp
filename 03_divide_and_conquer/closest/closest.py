@@ -12,13 +12,14 @@ def d(p1,p2):
 def minimum_distance_naive(points):
     if len(points) <= 1:
         return 0.0
-    min_d = sys.maxsize
+    min_d = d(points[0], points[1])
     l = len(points)
     for i in range(0, l):
-        for j in range(i + 1, l):
-            x = points[i]
-            y = points[j]
-            min_d = min(min_d, d(x,y))
+        for j in range(0, l):
+            if i != j:
+                x = points[i]
+                y = points[j]
+                min_d = min(min_d, d(x,y))
     return min_d
 
 def minimum_distance_r(points, l, r):
@@ -41,7 +42,7 @@ def minimum_distance_r(points, l, r):
     min_d = min(min_d_left, min_d_right)
 
     for i in range(l, m + 1):
-        if split_x - points[i][0] > min_d:
+        if split_x - points[i][0] >= min_d:
             continue
         for j in range(m + 1, r + 1):
             if points[j][0] - split_x > min_d:
@@ -59,33 +60,35 @@ test = False
 
 def generate_test_case(size):
     points = [0] * size
-    min_coordinate = -10**9
-    max_coordinate =  10**9
+    min_coordinate = -10**10
+    max_coordinate = 10**10
+    choices = [0,  max_coordinate]
 
     for i in range(0, size):
-        x = 0#random.randint(min_coordinate, max_coordinate)
-        y = random.randint(min_coordinate, max_coordinate)
+        x =choices[random.randint(0, len(choices)-1)]#  random.randint(min_coordinate, max_coordinate)
+        y =choices[random.randint(0, len(choices)-1)]#
         points[i] = (x,y)
     return points
 
 if test:
     times = []
-    test_case_count = 500000
-    
+    test_case_count = 50000#500000
+
     success = 0
     failures = []
 
     i = 0
-    for i in range(0, test_case_count):        
-        test_case_size = 1000
+    for i in range(0, test_case_count):
+        test_case_size = 3
         points = generate_test_case(test_case_size)
         # print("running against " + str(len(points)) + " points")
         expected = minimum_distance_naive(points)
         start = time.time()
-        actual = minimum_distance(points)         
+        actual = minimum_distance(points)
         end = time.time()
         times.append(end - start)
-        print (str(expected) + " - " + str(actual))
+        print ("{0:.4f} - {0:.4f}".format(expected, actual))
+
         if actual != expected:
             failures.append((points, expected, actual))
             raise Exception("Failed. Input: {0}, Expected: {1}, Actual: {2}".format(points, expected, actual))
@@ -118,4 +121,4 @@ else:
         points.append((x[i], y[i]))
     # points.sort(k)
     min_d = 0 if len(points) <= 1 else minimum_distance(points)
-    print("{0:.9f}".format(min_d))
+    print("{0:.4f}".format(min_d))
