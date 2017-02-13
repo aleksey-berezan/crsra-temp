@@ -23,17 +23,22 @@ def get_edit_distance_matrix(first, second, third):
                 else:
                     insertion1 = d[k][i][j - 1]
                     deletion1 = d[k][i - 1][j]
-                    insertion2 = d[k-1][i][j - 1]
-                    deletion2 = d[k-1][i - 1][j]
+                    insertion2 = d[k-1][i][j ]
+                    # deletion2 = d[k-1][i - 1][j]
                     # mismatch = d[i - 1][j - 1]
-                    d[k][i][j] = max(insertion1, deletion1, insertion2, deletion2)#, mismatch)
+                    d[k][i][j] = max(insertion1, deletion1, insertion2)#, mismatch)
 
     #return d[n][m]
+    dmax, pmax = -1, -1
+    for k in range(1, p+1):
+        if d[k][n][m] > dmax:
+            dmax = d[k][n][m]
+            pmax = k
 
     # backtrack
-    common = [None] * d[p][n][m]
-    c_index = d[p][n][m] - 1
-    k, i, j = p, n, m
+    common = [None] * dmax
+    c_index = dmax - 1
+    k, i, j = pmax, n, m
     while k > 0 and i > 0 and j > 0:
         if first[j - 1] == second[i - 1] == third[k - 1]:#d[i][j] > d[i-1][j-1]:
             common[c_index], c_index = first[j - 1], c_index - 1
@@ -59,13 +64,18 @@ def lcs3(a, b, c):
     return common
     # return "".join([str(x) for x in common])
 
-test = True
+test = False
 if test:
     test_cases = [#("abcdaf", "acbcf", ""),
                   ((['a', 'b', 'c', 'd', 'a', 'f'], ['a', 'c', 'b', 'c', 'f'], ['a', 'b', 'c', 'd', 'a', 'f']), ['a','b','c','f']),
                   ((['a', 'b', 'c', 'd', 'a', 'f'], ['a', 'c', 'b', 'c', 'f'], ['a', 'c', 'b', 'c', 'f']), ['a','b','c','f']),
                   ((list("123"), list("213"), list("135")), list("13")),
-                  (([8, 3, 2, 1, 7], [8, 2, 1, 3, 8, 10, 7], [6, 8, 3, 1, 4, 7]), [8, 3, 7])]
+                  ((list("123"), list("123"), list("123")), list("123")),
+                  ((list("123"), list("123"), list("1123")), list("123")),
+                  ((list("123"), list("12"), list("1123")), list("12")),
+                  ((list("1111"), list("2222111211"), list("11111")), list("1111")),
+                  (([8, 3, 2, 1, 7], [8, 2, 1, 3, 8, 10, 7], [6, 8, 3, 1, 4, 7]), [8, 3, 7])
+                  ]
     for (a,b,c),expected in test_cases:
         actual = lcs3(a,b,c)
         if actual != expected:
@@ -75,7 +85,7 @@ if test:
 else:
     #main
     #if __name__ == '__main__':
-    input = input()#sys.stdin.read()
+    input = sys.stdin.read()
     data = list(map(int, input.split()))
     an = data[0]
     data = data[1:]
@@ -88,4 +98,4 @@ else:
     cn = data[0]
     data = data[1:]
     c = data[:cn]
-    print(lcs3(a, b, c))
+    print(len(lcs3(a, b, c)))
