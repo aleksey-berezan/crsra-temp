@@ -36,7 +36,9 @@ responses = []# finish_time
 finish_time = 0
 last_arrival = -1
 current_time = 0
+i = 0
 for arrival_time, process_time in requests:
+    i += 1
     # if process_time == 0:
     #     responses.append(finish_time)
     #     continue
@@ -59,7 +61,7 @@ for arrival_time, process_time in requests:
 
     while not q.empty():
         start_time, packet_process_time = last(q)
-        if start_time > finish_time:
+        if start_time >= finish_time:
             break
         else:
             q.get_nowait()
