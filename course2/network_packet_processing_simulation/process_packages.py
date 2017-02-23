@@ -2,86 +2,57 @@
 
 from queue import Queue
 
-Test = False
-# main
-# 13
-size, count = 2,3
-requests = [(0,1),(0,1),(0,1)]
-
-# 15
-# size, count = 1,3
-# requests = [(0,2),(1,4),(5,3)]
-
-# 18
-size, count = 2,3
-requests = [(0,1),(3,1),(10,1)]
-
-Test = False
+def last_finish_time(q):
+    return q.queue[0]
 
 # main
-if not Test:
-    size, count = map(int, input().strip().split())
-    # parse
-    requests = []
-    for i in range(count):
-        arrival_time, process_time = map(int, input().strip().split())
-        requests.append((arrival_time, process_time))
+size, count = map(int, input().strip().split())
 
-def last(q):
-    return q.queue[q.qsize() - 1]
-
-# process
-# if len(requests) == 0:
-#     return
+# parse
+requests = []
+for i in range(count):
+    arrival_time, process_time = map(int, input().strip().split())
+    requests.append((arrival_time, process_time))
 
 q = Queue(size)
-responses = []# finish_time
-finish_time = 0
-last_arrival = -1
+responses = []
 current_time = 0
-i = 0
-for arrival_time, process_time in requests:
-    i += 1
-    # if process_time == 0:# and not q.empty() and last(q)[1] == 0:
-    #     finish_time = max(arrival_time, finish_time)
-    #     responses.append(finish_time)
-    #     continue
-    if q.full() and last(q)[1] == 0:
+last_arrival = -1
+finish_time = 0
+
+# simualte
+for arrival, size in requests:
+    same_arrival = last_arrival != -1 and last_arrival == arrival
+    last_arrival = arrival
+    if q.full() and last_finish_time(q) == 0:
         q.get_nowait()
-    read_same = last_arrival == arrival_time
-    if read_same:
+    # read
+    if same_arrival:
         if q.full():
             responses.append(-1)
         else:
-            finish_time = max(arrival_time, finish_time)
+            finish_time = max(finish_time, arrival) #idle
             responses.append(finish_time)
-            finish_time += process_time
-            q.put_nowait((finish_time, process_time))
+            finish_time += size
+            q.put_nowait(finish_time)
         continue
 
-    last_arrival = arrival_time
-
-    if q.full() and arrival_time < finish_time:
-        responses.append(-1)
-        continue
-
+    # process
     while not q.empty():
-        start_time, packet_process_time = last(q)
-        if finish_time <= start_time:# active processing
-            q.get_nowait()
-        elif arrival_time > finish_time:# idle processing
+        if last_finish_time(q) <= arrival:
             q.get_nowait()
         else:
             break
 
     if q.full():
         responses.append(-1)
-        continue
+    else:
+        finish_time = max(finish_time, arrival) #idle
+        responses.append(finish_time)
+        finish_time += size
+        q.put_nowait(finish_time)
+    continue
 
-    finish_time = max(arrival_time, finish_time)
-    responses.append(finish_time)
-    finish_time += process_time
-    q.put_nowait((finish_time, process_time))
-
+# output
 for response in responses:
     print(response)
