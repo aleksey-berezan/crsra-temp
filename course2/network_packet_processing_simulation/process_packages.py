@@ -12,6 +12,9 @@ requests = [(0,1),(0,1),(0,1)]
 # size, count = 1,3
 # requests = [(0,2),(1,4),(5,3)]
 
+# 18
+size, count = 2,3
+requests = [(0,1),(3,1),(10,1)]
 
 Test = False
 
@@ -39,9 +42,12 @@ current_time = 0
 i = 0
 for arrival_time, process_time in requests:
     i += 1
-    # if process_time == 0:
+    # if process_time == 0:# and not q.empty() and last(q)[1] == 0:
+    #     finish_time = max(arrival_time, finish_time)
     #     responses.append(finish_time)
     #     continue
+    if q.full() and last(q)[1] == 0:
+        q.get_nowait()
     read_same = last_arrival == arrival_time
     if read_same:
         if q.full():
@@ -61,11 +67,12 @@ for arrival_time, process_time in requests:
 
     while not q.empty():
         start_time, packet_process_time = last(q)
-        if start_time >= finish_time:
-            break
-        else:
+        if finish_time <= start_time:# active processing
             q.get_nowait()
-            # responses.append(start_time)
+        elif arrival_time > finish_time:# idle processing
+            q.get_nowait()
+        else:
+            break
 
     if q.full():
         responses.append(-1)
