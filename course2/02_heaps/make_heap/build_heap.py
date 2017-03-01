@@ -33,13 +33,10 @@ class HeapBuilder:
     r = j * 2 + 1
     min_index = j
 
-
     if self.InBounds(l) and self.ItemAt(l) < self.ItemAt(min_index):
-      # self.Swap(min_index, l)
       min_index = l
 
     if self.InBounds(r) and self.ItemAt(r) < self.ItemAt(min_index):
-      # self.Swap(min_index, r)
       min_index = r
 
     if min_index != j:
