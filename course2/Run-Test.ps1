@@ -1,6 +1,6 @@
 function Run-Test([string]$Number) {
-    $RootDir = "D:\GitRepos\coursera\course2\network_packet_processing_simulation"
-    "$Number" | %{ type "$RootDir\tests\$_" } |  python "$RootDir\process_packages.py" > "D:\Output\$Number.txt"
+    $RootDir = "D:\GitRepos\coursera\course2\02_heaps\make_heap"
+    "$Number" | %{ type "$RootDir\tests\$_" } |  python "$RootDir\build_heap.py" > "D:\Output\$Number.txt"
 
     $Expected = "$RootDir\tests\$Number.a"
     $Actual = "D:\Output\$Number.txt"
